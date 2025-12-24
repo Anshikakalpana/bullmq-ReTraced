@@ -38,6 +38,7 @@ api/
 
 ---
 
+
 ## Worker
 worker/
 ├── Dockerfile
@@ -88,8 +89,8 @@ job.service.ts
 ├── fetchNextJob()✅ 
 ├── markJobProcessing()
 ├── markJobCompleted()
-├── markJobFailed()
-├── moveToDeadQueue()
+├── markJobFailed()✅ 
+├── moveToDeadQueue()✅ 
 ├── retryJob()✅ 
 ├── getJobStatus()
 └── getMetrics()

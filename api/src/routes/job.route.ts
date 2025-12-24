@@ -1,5 +1,5 @@
 import { createJob } from "../job/job.services";
-import { JobResult } from "../job/job";
+import { JobResult } from "../job/job.type";
 import { Router, Request, Response } from "express";
 
 const router = Router();

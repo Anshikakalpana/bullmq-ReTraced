@@ -1,3 +1,4 @@
+import { JobErrorCode } from '../failures/jobErrorCodes';
 export  type job = {
   jobId: string,
 
@@ -25,6 +26,7 @@ export  type job = {
 
 
 export type JobError = {
+  code: JobErrorCode;
   message: string;
   stack?: string;
   failedAt: number;
@@ -43,7 +45,11 @@ export type JobResult = {
 
 
 export type jobData = {
-  email:string,
-  message:string
+  emailFrom: string;
+  emailTo: string;
+  subject: string;
+  body: string;
+  template?: string;
+  attachments?: string[];
 
 }
