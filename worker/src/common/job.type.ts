@@ -1,4 +1,4 @@
-import { JobErrorCode } from '../failures/jobErrorCodes';
+import { JobErrorCode } from "./failures/jobErrorCodes.js";
 export  type job = {
   jobId: string,
 
@@ -20,6 +20,8 @@ export  type job = {
   type?: string,
   priority?: number,
   runAt?: number
+
+  delay?: delay,
 };
 
 
@@ -52,4 +54,9 @@ export type jobData = {
   template?: string;
   attachments?: string[];
 
+}
+
+export type delay={
+  retryAfterSeconds: number,
+  limitOfTries: number
 }

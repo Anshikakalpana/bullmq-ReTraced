@@ -1,8 +1,9 @@
 import redis from '../utils/redis';
-import { getQueueKeys } from '../utils/queue.constants';
+import { getQueueKeys } from '../common/queue.constants';
 import { job ,JobResult} from './job.type';
-import { jobFailureType } from '../failures/error.type';
-import { JobErrorCode } from '../failures/jobErrorCodes';
+import { jobFailureType } from '../common/failures/error.type';
+import { JobErrorCode } from '../common/failures/jobErrorCodes';
+
 
 export const createJob = async (jobData: job): Promise<JobResult> => {
   const newJobResult: JobResult = {
@@ -66,22 +67,22 @@ export const createJob = async (jobData: job): Promise<JobResult> => {
 
 
 
+// in worker folder
 
+// export const fetchNextJob = async (queueName: string): Promise<job | null> => {
+//   try {
+//     const queue = getQueueKeys(queueName);
+//     const result = await redis.lPop(queue.ready);
 
-const fetchNextJob = async (queueName: string): Promise<job | null> => {
-  try {
-    const queue = getQueueKeys(queueName);
-    const result = await redis.lPop(queue.ready);
-
-    if (result) {
-      return JSON.parse(result) as job;
-    }
-    return null;
-  } catch (err) {
-    console.error('Error fetching job from queue:', err);
-    throw err;
-  }
-};
+//     if (result) {
+//       return JSON.parse(result) as job;
+//     }
+//     return null;
+//   } catch (err) {
+//     console.error('Error fetching job from queue:', err);
+//     throw err;
+//   }
+// };
 
 
 
@@ -105,38 +106,38 @@ const getJobStatus= async (jobId: string) => {
 
 
 
-const retryJob = async (jobData: job): Promise<void> => {
-  try {
-    jobData.tries += 1;
-    jobData.updatedAt = Date.now();
-    jobData.status = 'pending';
-    const queue = getQueueKeys(jobData.queueName);
-    await redis.rPush(queue.ready, JSON.stringify(jobData));
-  } catch (err) {
-    console.error('Error retrying job:', err);
-    throw err;
-  }
-};
+// const retryJob = async (jobData: job): Promise<void> => {
+//   try {
+//     jobData.tries += 1;
+//     jobData.updatedAt = Date.now();
+//     jobData.status = 'pending';
+//     const queue = getQueueKeys(jobData.queueName);
+//     await redis.rPush(queue.ready, JSON.stringify(jobData));
+//   } catch (err) {
+//     console.error('Error retrying job:', err);
+//     throw err;
+//   }
+// };
 
 
 
 
 
-const moveJobToDLQ = async (jobData: job, result: JobResult): Promise<void> => {
+// const moveJobToDLQ = async (jobData: job, result: JobResult): Promise<void> => {
 
-  try{
-    if(result.error===undefined){
-      throw new Error('JobResult error is undefined, cannot move to DLQ');
-    }
-    const queue = getQueueKeys(jobData.queueName);
+//   try{
+//     if(result.error===undefined){
+//       throw new Error('JobResult error is undefined, cannot move to DLQ');
+//     }
+//     const queue = getQueueKeys(jobData.queueName);
 
-    await redis.rPush(queue.dlq, JSON.stringify({...jobData, error: result.error}));
-  }catch(err){
-    console.error('Error moving job to DLQ:', err);
-    throw err;
-  }
+//     await redis.rPush(queue.dlq, JSON.stringify({...jobData, error: result.error}));
+//   }catch(err){
+//     console.error('Error moving job to DLQ:', err);
+//     throw err;
+//   }
 
-}
+// }
 
 
 
