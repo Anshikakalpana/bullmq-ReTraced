@@ -9,7 +9,7 @@ export  type job = {
 
   queueName: string,
 
-  status: 'pending' | 'processing' | 'completed' | 'failed' | 'dead',
+  status: 'pending' | 'processing' | 'completed' | 'failed' | 'dead'| 'delayed',
 
   tries: number,
   maxTries: number,

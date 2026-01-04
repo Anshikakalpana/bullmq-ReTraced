@@ -28,7 +28,7 @@ export const moveJobToDLQ = async (jobData: job, result: JobResult): Promise<voi
       throw new Error('JobResult error is undefined, cannot move to DLQ');
     }
     const queue = getQueueKeys(jobData.queueName);
-
+  
 
 
     await redis.rPush(queue.dlq, JSON.stringify({...jobData, error: result.error}));

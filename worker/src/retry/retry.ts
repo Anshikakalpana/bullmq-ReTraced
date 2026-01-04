@@ -4,7 +4,7 @@ import { getQueueKeys } from "../common/queue.constants.js";
 import { moveJobToDLQ } from "../dlq/dlq.producer.js";
 import { delayJob } from "../delay-jobs/delay-job.js";
 
-const retryJob = async (delayData:delay ,jobData: job, result: JobResult): Promise<void> => {
+export const retryJob = async (delayData:delay ,jobData: job, result: JobResult): Promise<void> => {
   try {
     // safety guards
 if (!jobData || !jobData.queueName) {

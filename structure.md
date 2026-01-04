@@ -54,10 +54,10 @@ worker/
     │   ├── report.handler.ts
     │   └── index.ts           # handler registry
     ├── retry/
-    │   ├── retry.strategy.ts  # retry decision logic
-    │   └── backoff.ts         # exponential backoff
+    │   ├── retry.strategy.ts✅  # retry decision logic
+    │   └── backoff.ts   ✅      # exponential backoff
     ├── dlq/
-    │   ├── dlq.producer.ts    # push job to DLQ
+    │   ├── dlq.producer.ts  ✅    # push job to DLQ
     │   ├── dlq.types.ts       # DLQ job structure
     │   └── dlq.metrics.ts     # DLQ counters
     ├── queue/

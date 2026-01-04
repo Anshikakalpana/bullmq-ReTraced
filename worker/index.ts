@@ -1,7 +1,7 @@
 import redis from './src/utils/redis';
 import { getQueueKeys } from '../api/src/common/queue.constants';
 import { job } from '../api/src/common/job.type';
-import { processJob } from './src/worker';
+import processJob  from './src/worker';
 
 const fetchNextJob = async (queueName: string): Promise<job | null> => {
   const queue = getQueueKeys(queueName);
