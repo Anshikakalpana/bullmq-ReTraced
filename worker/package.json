@@ -4,12 +4,12 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "node --loader ts-node/esm src/worker.ts",
+    "dev": "node --loader ts-node/esm src/index.ts",
     "build": "tsc",
-    "start": "node dist/worker.js"
+    "start": "node dist/index.js",
+     "test": "jest",
+  "test:watch": "jest --watch"
   },
-
-
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -20,8 +20,11 @@
     "redis": "^5.10.0"
   },
   "devDependencies": {
+    "@types/jest": "^30.0.0",
     "@types/node": "^25.0.2",
+    "jest": "^30.2.0",
     "nodemon": "^3.1.11",
+    "ts-jest": "^29.4.6",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   }
