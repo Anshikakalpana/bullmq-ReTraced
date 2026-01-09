@@ -63,7 +63,7 @@ const startWorker = async () => {
 
   const queueName = 'email';
 
-  // Visibility timeout watchdog
+  // Visibility timeout watch
   setInterval(async () => {
     try {
       await recoverStuckJobs(queueName);
