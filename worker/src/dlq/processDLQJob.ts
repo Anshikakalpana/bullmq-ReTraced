@@ -10,10 +10,11 @@ import redis from "../utils/redis.js";
 import { getQueueKeys } from "../common/queue.constants.js";
 import { permanentFailures , temporaryFailures } from "../common/failures/error.type.js";
 import { job as Job } from "../common/job.type.js";
+import { dlq ,DLQRetryAttempt} from "./dlq.types.js";
 
 
 
-export const processDLQJob = async (dlqJob: Job): Promise<void> => {
+export const processDLQJob = async (dlqJob: dlq): Promise<void> => {
   if (!dlqJob) {
     throw new Error("Invalid DLQ job");
   }
@@ -30,9 +31,15 @@ export const processDLQJob = async (dlqJob: Job): Promise<void> => {
 
 
   if (permanentFailures.has(error?.code)) {
-    await redis.lRem(queue.dlq, 0, JSON.stringify(dlqJob));
+    dlqJob.status = 'poisoned';
+dlqJob.failureType = 'POISON';
+dlqJob.updatedAt = Date.now();
 
-    console.log("DLQ job permanently discarded", {
+await redis.lRem(queue.dlq, 0, JSON.stringify(dlqJob));
+await redis.rPush(queue.poison, JSON.stringify(dlqJob));
+
+
+    console.log("DLQ job permanently discarded and added to poison queue", {
       jobId: dlqJob.jobId,
       errorCode: error?.code,
     });
@@ -43,13 +50,31 @@ export const processDLQJob = async (dlqJob: Job): Promise<void> => {
   
   
 
-  if (temporaryFailures.has(error?.code)) {
-    const retryJob: Job = {
+  if (temporaryFailures.has(error.code)) {
+    const retryAttempt: DLQRetryAttempt = {
+      attemptedAt: Date.now(),
+      trigger: 'AUTO',
+      changesMade: false,
+      result: 'FAILED',
+      error,
+    };
+
+    const updatedDLQ: dlq = {
       ...dlqJob,
-      tries: 0,
-      status: "pending",
-      lastError: undefined,
       updatedAt: Date.now(),
+      retries: [...(dlqJob.retries ?? []), retryAttempt],
+    };
+
+    const retryJob: Job = {
+      jobId: dlqJob.jobId,
+      queueName: dlqJob.queueName,
+      jobData: dlqJob.jobData as any,
+      status: 'pending',
+      tries: 0,
+      maxTries: dlqJob.maxTries,
+      priority: dlqJob.priority,
+      runAt: dlqJob.runAt,
+      createdAt: Date.now(),
     };
 
     await redis.multi()
@@ -57,7 +82,7 @@ export const processDLQJob = async (dlqJob: Job): Promise<void> => {
       .rPush(queue.ready, JSON.stringify(retryJob)) // requeue
       .exec();
 
-    console.log("DLQ job manually retried", {
+    console.log("DLQ job requeued", {
       jobId: retryJob.jobId,
       queue: retryJob.queueName,
     });

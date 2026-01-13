@@ -8,7 +8,7 @@ export type dlq = {
 
   jobData: unknown; // immutable snapshot
 
-  status: 'dead';
+  status: 'dead' | 'poisoned';
 
   failureType?: 'TEMPORARY' | 'PERMANENT' | 'POISON';
 

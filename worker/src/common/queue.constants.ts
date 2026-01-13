@@ -5,4 +5,5 @@ export const getQueueKeys = (queueName: string) => ({
   processing: `${queueName}:processing`,
   dlq: `${queueName}:dlq`,
   processingZset: `${queueName}:processing:zset`,
+  poison:`${queueName}:poison`,
 });
