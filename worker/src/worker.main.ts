@@ -1,11 +1,11 @@
-import { Job, JobResult } from "./common/job.type.js";
+import { Job, JobResult ,RetryAttempt } from "./common/job.type.js";
 import { moveJobToDLQ } from "./dlq/dlq.producer.js";
 import jobHandler from "./handlers/email.handler.js";
 import { permanentFailures, temporaryFailures } from "./common/failures/error.type.js";
 import { JobErrorCode } from "./common/failures/jobErrorCodes.js";
 import { retryJob } from "./retry/threeTierRetry.js";
+import { retryLinearly ,retryExponentially ,retryAfterFixedInterval } from "./retry/retryStrategy.js";
 
-const QUEUES = ['jobQueue']; 
 
 const processJob = async (job: Job): Promise<void> => {
 
@@ -29,18 +29,67 @@ try{
   //  Permanent failure → DLQ
   if (error?.code && permanentFailures.has(error.code)) {
     job.status = "failed";
+
+    
     await moveJobToDLQ(job, result);
     return;
   }
 
+
+
   //  Temporary failure → Retry
   if (error?.code && temporaryFailures.has(error.code)) {
-    job.status="delayed";
+     job.status="delayed";
+    
+    const retryAttempt : RetryAttempt = {
+
+      attemptedAt: Date.now(),
+      trigger: 'AUTO',
+      changesMade: false,
+      result: 'PENDING',
+      error,
+      
+
+    }
+    job.retryAttempts = [...(job.retryAttempts ?? []), retryAttempt];
 
     
+    if(!job.backoffConfig){
 
-    await retryJob( job, result);
-    return;
+      throw new Error("Missing backoffConfig for retry");
+
+    }
+
+    const baseDelay= job.backoffConfig.baseDelaySeconds || 5; // default 5 seconds
+
+    if(job.backoffStrategy==='threeTier'){
+
+      await retryJob(job , result);
+
+      return;
+
+    } else if (job.backoffStrategy==='exponential'){
+
+      await retryExponentially(job , result);
+
+      return;
+
+    } else if (job.backoffStrategy==='fixed'){
+
+  
+  
+      await retryAfterFixedInterval(job , result , baseDelay); 
+
+      return;
+
+    } else if (job.backoffStrategy==='linear'){
+
+      await retryLinearly( job , result , baseDelay);
+
+      return ;
+
+    }
+    
   }
 
   //  Unknown error → fail-safe DLQ

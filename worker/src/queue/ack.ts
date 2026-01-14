@@ -1,8 +1,8 @@
 import redis from "../utils/redis.js";
 import { getQueueKeys } from "../common/queue.constants.js";
-import { job } from "../common/job.type.js";
+import { Job } from "../common/job.type.js";
 
-export const ackJob = async (job: job): Promise<void> => {
+export const ackJob = async (job: Job): Promise<void> => {
   const queue = getQueueKeys(job.queueName);
 
 

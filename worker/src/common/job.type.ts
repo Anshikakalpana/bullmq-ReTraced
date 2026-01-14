@@ -29,10 +29,10 @@ export type Job = {
   priority?: number;
   runAt?: number;
 
-  retries?: RetryAttempt[];
+  retryAttempts?: RetryAttempt[];
 
   backoffConfig: BackoffConfig;
-  backoffStrategy?: 'exponential' | 'fixed' | 'threeTier';
+  backoffStrategy?: 'exponential' | 'fixed' | 'threeTier' | 'linear';
 };
 
 export type JobError = {
@@ -63,7 +63,7 @@ export type RetryAttempt = {
   attemptedAt: number;
   trigger: 'AUTO' | 'MANUAL';
   changesMade: boolean;
-  result: 'SUCCESS' | 'FAILED';
+  result: 'SUCCESS' | 'FAILED' | 'PENDING';
 };
 
 export type BackoffConfig = {

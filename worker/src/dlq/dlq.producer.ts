@@ -27,7 +27,7 @@ export const moveJobToDLQ = async (
 
       maxTries: jobData.maxTries,
 
-      actualTries: jobData.tries,
+      tries: jobData.tries,
 
 
       lastError: {
@@ -37,11 +37,11 @@ export const moveJobToDLQ = async (
         failedAt: Date.now(),
       },
 
-      retries: jobData.retries,
+     
 
       backoffConfig: jobData.backoffConfig,
 
-      backoffStrategy: jobData.backoffStrategy,
+      backoffStrategy: jobData.backoffStrategy ,
 
       createdAt: jobData.createdAt,
 

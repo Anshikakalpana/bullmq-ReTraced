@@ -13,7 +13,7 @@ export type dlq = {
   failureType?: 'TEMPORARY' | 'PERMANENT' | 'POISON';
 
   maxTries: number;
-  actualTries: number;
+  tries: number;
 
   lastError: JobError;
 
@@ -28,7 +28,7 @@ export type dlq = {
   runAt?: number;
 
   backoffConfig: BackoffConfig;
-  backoffStrategy?: 'exponential' | 'fixed' | 'threeTier';
+  backoffStrategy?: 'exponential' | 'fixed' | 'threeTier' | 'linear' | undefined;
 
 };
 

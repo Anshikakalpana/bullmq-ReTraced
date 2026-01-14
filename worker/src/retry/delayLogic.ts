@@ -27,7 +27,7 @@ export const handleRetryOrDLQ = async (
 
   if (delaySeconds !== undefined) {
     await delayJob(job, delaySeconds);
-    job.status = "pending";
+    job.status = "delayed";
     console.log("job_delayed", {
       jobId: job.jobId,
       delaySeconds,
