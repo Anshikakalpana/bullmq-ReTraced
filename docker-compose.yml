@@ -52,7 +52,7 @@ services:
 
   worker:
     build: ./worker
-    container_name: job_worker
+   
     restart: unless-stopped
     depends_on:
       redis:

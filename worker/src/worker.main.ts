@@ -3,7 +3,7 @@ import { moveJobToDLQ } from "./dlq/dlq.producer.js";
 import jobHandler from "./handlers/email.handler.js";
 import { permanentFailures, temporaryFailures } from "./common/failures/error.type.js";
 import { JobErrorCode } from "./common/failures/jobErrorCodes.js";
-import { retryJob } from "./retry/retry.js";
+import { retryJob } from "./retry/threeTierRetry.js";
 
 const QUEUES = ['jobQueue']; 
 

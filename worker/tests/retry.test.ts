@@ -1,4 +1,4 @@
-import { retryJob } from '../src/retry/retry';
+import { retryJob } from '../src/retry/threeTierRetry';
 import redis from '../src/utils/redis';
 import { delayJob } from '../src/delay-jobs/delay-job';
 import { moveJobToDLQ } from '../src/dlq/dlq.producer';

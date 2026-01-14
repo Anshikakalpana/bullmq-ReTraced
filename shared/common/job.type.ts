@@ -56,7 +56,7 @@ export type jobData = {
 
 }
 
-export type delay={
+export type backoffTime={
   retryAfterSeconds: number,
   limitOfTries: number
 }

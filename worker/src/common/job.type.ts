@@ -19,7 +19,12 @@ export  type job = {
 
   type?: string,
   priority?: number,
-  runAt?: number
+  runAt?: number,
+
+
+  retries?: retryAttempt[];
+
+  backoffConfig : backoffConfig;
 
   
 };
@@ -56,7 +61,22 @@ export type jobData = {
 
 }
 
-export type delay={
-  retryAfterSeconds: number,
-  limitOfTries: number
+
+
+export type retryAttempt={
+  error : JobError,
+  attemptedAt: number,
+  trigger: 'AUTO' | 'MANUAL',
+  changesMade: boolean,
+  result: 'SUCCESS' | 'FAILED',
+}
+
+export type backoffConfig={
+  baseDelaySeconds: number,
+  maxDelaySeconds: number,
+  factor: number,
+ jitterSeconds?: number,
+ limitOfTries: number,
+ 
+  
 }

@@ -12,7 +12,7 @@ export const retryDLQJobManually = async (
 
   const queue = getQueueKeys(queueName);
 
-  // 1️⃣ Fetch DLQ jobs
+  // 1️ Fetch DLQ jobs
   const dlqJobs = await redis.lRange(queue.dlq, 0, -1);
 
   const rawDLQJob = dlqJobs.find((raw) => {
@@ -30,7 +30,7 @@ export const retryDLQJobManually = async (
 
   const dlqJob = JSON.parse(rawDLQJob) as Job;
 
-  // 2️⃣ Reset job for retry
+  // 2️ Reset job for retry
   const retryJob: Job = {
     ...dlqJob,
     status: "pending",
@@ -39,7 +39,7 @@ export const retryDLQJobManually = async (
     updatedAt: Date.now(),
   };
 
-  // 3️⃣ Atomically move job
+  // 3️ Atomically move job
   await redis
     .multi()
     .lRem(queue.dlq, 0, rawDLQJob)

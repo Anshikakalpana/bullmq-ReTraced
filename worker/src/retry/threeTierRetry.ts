@@ -1,10 +1,12 @@
 import redis from "../utils/redis.js";
-import { job, JobResult ,delay } from "../common/job.type.js";
+import { job, JobResult ,backoffConfig } from "../common/job.type.js";
 import { getQueueKeys } from "../common/queue.constants.js";
 import { moveJobToDLQ } from "../dlq/dlq.producer.js";
 import { delayJob } from "../delay-jobs/delay-job.js";
+import { exponentialBackoffStrategy } from "./backoffStrategy.js";
 
-export const retryJob = async (delayData:delay ,jobData: job, result: JobResult): Promise<void> => {
+export const retryJob = async (jobData: job, result: JobResult): Promise<void> => {
+  const backoffParams= jobData.backoffConfig;
   try {
     // safety guards
 if (!jobData || !jobData.queueName) {
@@ -33,7 +35,7 @@ if (!jobData || !jobData.queueName) {
 
     //  delay retry window
     if (
-      jobData.tries >= delayData.limitOfTries &&
+      jobData.tries >= backoffParams.limitOfTries &&
       jobData.tries <= jobData.maxTries
     ) {
 
@@ -42,15 +44,19 @@ if (!jobData || !jobData.queueName) {
 // Exponential backoff calculation
 //why it needed?- so that the failed jobs do not overload the system by retrying too quickly
 
-  const backoffSeconds = Math.min(
-  delayData.retryAfterSeconds *
-    Math.pow(2, jobData.tries - delayData.limitOfTries),
-  MAX_BACKOFF_SECONDS
+
+
+const backoffSeconds = exponentialBackoffStrategy(
+  backoffParams,
+  jobData.tries
 );
-     
+
+
     // delay the job and retry the job after backoffSeconds
       await delayJob(jobData, backoffSeconds);
+
       console.log(`job retry after ${backoffSeconds} seconds`);
+
        jobData.status = "pending";
 
     console.log("job_delayed", {
@@ -61,6 +67,7 @@ if (!jobData || !jobData.queueName) {
 
 
       return;
+
     }
 
     //  Immediate retry if within limit
@@ -72,6 +79,7 @@ if (!jobData || !jobData.queueName) {
    await redis.rPush(queue.ready, JSON.stringify(jobData));
    console.log("job_requeued_immediately", {
     jobId: jobData.jobId,
+
 });
 
 
