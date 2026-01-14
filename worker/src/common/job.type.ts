@@ -1,36 +1,39 @@
 import { JobErrorCode } from "./failures/jobErrorCodes.js";
-export  type job = {
-  jobId: string,
 
-  createdAt: number,
-  updatedAt?: number,
+export type Job = {
+  jobId: string;
 
-  jobData: jobData,
+  createdAt: number;
+  updatedAt?: number;
 
-  queueName: string,
+  jobData: JobData;
 
-  status: 'pending' | 'processing' | 'completed' | 'failed' | 'dead'| 'delayed' | 'poisoned',
+  queueName: string;
 
-  tries: number,
-  maxTries: number,
+  status:
+    | 'pending'
+    | 'processing'
+    | 'completed'
+    | 'failed'
+    | 'dead'
+    | 'delayed'
+    | 'poisoned';
 
-  lastError?: string,
-  deadReason?: string,
+  tries: number;
+  maxTries: number;
 
-  type?: string,
-  priority?: number,
-  runAt?: number,
+  lastError?: JobError;
+  deadReason?: string;
 
+  type?: string;
+  priority?: number;
+  runAt?: number;
 
-  retries?: retryAttempt[];
+  retries?: RetryAttempt[];
 
-  backoffConfig : backoffConfig;
-
-  
+  backoffConfig: BackoffConfig;
+  backoffStrategy?: 'exponential' | 'fixed' | 'threeTier';
 };
-
-
-
 
 export type JobError = {
   code: JobErrorCode;
@@ -39,44 +42,34 @@ export type JobError = {
   failedAt: number;
 };
 
-
-
-
-export type JobResult = {
+export type JobResult<T = unknown> = {
   success: boolean;
-  output?: any;
+  output?: T;
   error?: JobError;
   finishedAt: number;
 };
 
-
-
-export type jobData = {
+export type JobData = {
   emailFrom: string;
   emailTo: string;
   subject: string;
   body: string;
   template?: string;
   attachments?: string[];
+};
 
-}
+export type RetryAttempt = {
+  error: JobError;
+  attemptedAt: number;
+  trigger: 'AUTO' | 'MANUAL';
+  changesMade: boolean;
+  result: 'SUCCESS' | 'FAILED';
+};
 
-
-
-export type retryAttempt={
-  error : JobError,
-  attemptedAt: number,
-  trigger: 'AUTO' | 'MANUAL',
-  changesMade: boolean,
-  result: 'SUCCESS' | 'FAILED',
-}
-
-export type backoffConfig={
-  baseDelaySeconds: number,
-  maxDelaySeconds: number,
-  factor: number,
- jitterSeconds?: number,
- limitOfTries: number,
- 
-  
-}
+export type BackoffConfig = {
+  baseDelaySeconds: number;
+  maxDelaySeconds: number;
+  factor: number;
+  jitterSeconds?: number;
+  limitOfTries: number;
+};

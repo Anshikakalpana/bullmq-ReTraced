@@ -1,15 +1,24 @@
 import redis from "../utils/redis.js";
-import { job, JobResult ,backoffConfig } from "../common/job.type.js";
+import { Job, JobResult ,BackoffConfig } from "../common/job.type.js";
 import { getQueueKeys } from "../common/queue.constants.js";
 import { moveJobToDLQ } from "../dlq/dlq.producer.js";
 import { delayJob } from "../delay-jobs/delay-job.js";
 import { exponentialBackoffStrategy } from "./backoffStrategy.js";
 
-export const retryJob = async (jobData: job, result: JobResult): Promise<void> => {
+export const retryJob = async (jobData: Job, result: JobResult): Promise<void> => {
   const backoffParams= jobData.backoffConfig;
+
+
+if (!backoffParams) {
+  throw new Error("Missing backoffConfig");
+}
+
+
+
+
   try {
     // safety guards
-if (!jobData || !jobData.queueName) {
+  if (!jobData || !jobData.queueName) {
   console.error("Invalid job data received for retry");
   return;
 }
@@ -39,7 +48,7 @@ if (!jobData || !jobData.queueName) {
       jobData.tries <= jobData.maxTries
     ) {
 
-      const MAX_BACKOFF_SECONDS = 60 * 60; // 1 hour cap
+      
 
 // Exponential backoff calculation
 //why it needed?- so that the failed jobs do not overload the system by retrying too quickly

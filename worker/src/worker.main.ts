@@ -1,4 +1,4 @@
-import { job, JobResult } from "./common/job.type.js";
+import { Job, JobResult } from "./common/job.type.js";
 import { moveJobToDLQ } from "./dlq/dlq.producer.js";
 import jobHandler from "./handlers/email.handler.js";
 import { permanentFailures, temporaryFailures } from "./common/failures/error.type.js";
@@ -7,7 +7,7 @@ import { retryJob } from "./retry/threeTierRetry.js";
 
 const QUEUES = ['jobQueue']; 
 
-const processJob = async (job: job): Promise<void> => {
+const processJob = async (job: Job): Promise<void> => {
 
   if (!job) {
     throw new Error("No job provided for processing");
@@ -37,12 +37,9 @@ try{
   if (error?.code && temporaryFailures.has(error.code)) {
     job.status="delayed";
 
-    const delayData = {
-      retryAfterSeconds: 5,
-      limitOfTries: 3   // delay starts after 3 attempts
-    };
+    
 
-    await retryJob(delayData, job, result);
+    await retryJob( job, result);
     return;
   }
 

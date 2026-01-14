@@ -27,6 +27,8 @@ export type dlq = {
   priority?: number;
   runAt?: number;
 
+  backoffConfig: BackoffConfig;
+  backoffStrategy?: 'exponential' | 'fixed' | 'threeTier';
 
 };
 
@@ -57,4 +59,14 @@ export type DLQRetryAttempt = {
   result: 'FAILED' | 'SUCCESS';
 
   error?: JobError;
+};
+
+
+
+export type BackoffConfig = {
+  baseDelaySeconds: number;
+  maxDelaySeconds: number;
+  factor: number;
+  jitterSeconds?: number;
+  limitOfTries: number;
 };

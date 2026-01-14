@@ -1,11 +1,11 @@
 
 
 import redis from "../utils/redis.js";
-import { job ,JobResult } from "../common/job.type.js";
+import { Job ,JobResult } from "../common/job.type.js";
 import { getQueueKeys } from "../common/queue.constants.js";
 import { dlq } from "./dlq.types.js";
 export const moveJobToDLQ = async (
-  jobData: job,
+  jobData: Job,
   result: JobResult
 ): Promise<void> => {
 
@@ -36,6 +36,12 @@ export const moveJobToDLQ = async (
         stack: result.error.stack,
         failedAt: Date.now(),
       },
+
+      retries: jobData.retries,
+
+      backoffConfig: jobData.backoffConfig,
+
+      backoffStrategy: jobData.backoffStrategy,
 
       createdAt: jobData.createdAt,
 

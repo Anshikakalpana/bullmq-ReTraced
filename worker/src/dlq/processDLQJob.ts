@@ -9,7 +9,7 @@
 import redis from "../utils/redis.js";
 import { getQueueKeys } from "../common/queue.constants.js";
 import { permanentFailures , temporaryFailures } from "../common/failures/error.type.js";
-import { job as Job } from "../common/job.type.js";
+import {  Job } from "../common/job.type.js";
 import { dlq ,DLQRetryAttempt} from "./dlq.types.js";
 
 
@@ -31,13 +31,16 @@ export const processDLQJob = async (dlqJob: dlq): Promise<void> => {
 
 
   if (permanentFailures.has(error?.code)) {
-    dlqJob.status = 'poisoned';
+
+
+   const originalDLQ = JSON.stringify(dlqJob);
+
+dlqJob.status = 'poisoned';
 dlqJob.failureType = 'POISON';
 dlqJob.updatedAt = Date.now();
 
-await redis.lRem(queue.dlq, 0, JSON.stringify(dlqJob));
+await redis.lRem(queue.dlq, 0, originalDLQ);
 await redis.rPush(queue.poison, JSON.stringify(dlqJob));
-
 
     console.log("DLQ job permanently discarded and added to poison queue", {
       jobId: dlqJob.jobId,
@@ -55,7 +58,7 @@ await redis.rPush(queue.poison, JSON.stringify(dlqJob));
       attemptedAt: Date.now(),
       trigger: 'AUTO',
       changesMade: false,
-      result: 'FAILED',
+      result: 'SUCCESS',
       error,
     };
 
@@ -71,6 +74,7 @@ await redis.rPush(queue.poison, JSON.stringify(dlqJob));
       jobData: dlqJob.jobData as any,
       status: 'pending',
       tries: 0,
+      backoffConfig: dlqJob.backoffConfig,
       maxTries: dlqJob.maxTries,
       priority: dlqJob.priority,
       runAt: dlqJob.runAt,

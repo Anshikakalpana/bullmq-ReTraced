@@ -1,7 +1,7 @@
-import { backoffConfig } from "../common/job.type";
+import { BackoffConfig } from "../common/job.type";
 
 export const exponentialBackoffStrategy = (
-  backoffParams: backoffConfig,
+  backoffParams: BackoffConfig,
   currentTry: number
 ): number => {
 
