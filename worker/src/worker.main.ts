@@ -21,6 +21,7 @@ try{
 
   if (result.success) {
     job.status = "completed";
+    
     return;
   }
 

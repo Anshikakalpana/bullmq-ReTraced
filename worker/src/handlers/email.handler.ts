@@ -1,9 +1,21 @@
-import { job, JobResult } from "../common/job.type.js";
+import { Job, JobResult } from "../common/job.type.js";
 import { JobErrorCode } from "../common/failures/jobErrorCodes.js";
 
-const jobHandler = async (job: job): Promise<JobResult> => {
+const jobHandler = async (job: Job): Promise<JobResult> => {
 
   const testCase = job.jobData.subject; // using subject to control test
+  if(job.jobData?.emailFrom==="test@a.com"){
+    const result: JobResult = {
+      success: false,
+      error: {
+        code: JobErrorCode.NETWORK_ERROR,
+        message: "Auth failure for test@a.com",
+        failedAt: Date.now()
+      },
+      finishedAt: Date.now()
+    };
+    return result;
+  }
 
   switch (testCase) {
 

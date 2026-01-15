@@ -53,6 +53,8 @@ export const moveJobToDLQ = async (
 
     await redis.rPush(queue.dlq, JSON.stringify(dlqJob));
 
+    
+
 
   } catch (err) {
 

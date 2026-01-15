@@ -1,4 +1,4 @@
-import { BackoffConfig } from "../common/job.type";
+import { BackoffConfig } from "../common/job.type.js";
 
 export const exponentialBackoffStrategy = (
   backoffParams: BackoffConfig,

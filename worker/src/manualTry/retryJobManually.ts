@@ -1,9 +1,9 @@
-import { job } from "../common/job.type.js";
+import { Job } from "../common/job.type.js";
 import { getQueueKeys } from "../common/queue.constants.js";
 import jobHandler from "../handlers/email.handler.js";
 import redis from "../utils/redis.js";
 
-export const processJobManually = async(deadJob :job, queueName:string):Promise<void>=>{
+export const processJobManually = async(deadJob :Job, queueName:string):Promise<void>=>{
 
         try{
             if(!deadJob){

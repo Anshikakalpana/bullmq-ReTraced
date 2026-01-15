@@ -1,4 +1,4 @@
-import { JobErrorCode } from "../common/failures/jobErrorCodes";
+import { JobErrorCode } from "../common/failures/jobErrorCodes.js";
 
 export type dlq = {
 
