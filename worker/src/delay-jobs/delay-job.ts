@@ -19,6 +19,6 @@ export const delayJob = async (
   // Store delayed jobs in a sorted set
   await redis.zAdd(queueKeys.delayed, {
     score: runAt,
-    value: JSON.stringify(jobData),
+    value: jobData.jobId,
   });
 };

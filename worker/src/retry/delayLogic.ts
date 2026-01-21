@@ -1,9 +1,9 @@
-import redis from "../utils/redis.js";
+
 import { Job, JobResult ,BackoffConfig } from "../common/job.type.js";
-import { getQueueKeys } from "../common/queue.constants.js";
 import { moveJobToDLQ } from "../dlq/dlq.producer.js";
 import { delayJob } from "../delay-jobs/delay-job.js";
-import { exponentialBackoffStrategy } from "./backoffStrategy.js";
+import { ackJob } from "../queue/ack.js";
+
 
 
 
@@ -27,6 +27,7 @@ export const handleRetryOrDLQ = async (
 
   if (runAt !== undefined) {
     await delayJob(job, runAt);
+  
     job.status = "delayed";
     console.log("job_delayed", {
       jobId: job.jobId,

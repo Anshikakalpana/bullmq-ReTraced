@@ -1,5 +1,5 @@
-import redis from "../utils/redis.js";
-import { getQueueKeys } from "../common/queue.constants.js";
+import redis from "../../src/utils/redis.js";
+import { getQueueKeys } from "../../src/common/queue.constants.js";
 
 const queue = getQueueKeys("email");
 
