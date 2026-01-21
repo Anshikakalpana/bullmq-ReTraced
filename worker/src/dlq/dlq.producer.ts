@@ -4,6 +4,7 @@ import redis from "../utils/redis.js";
 import { Job ,JobResult } from "../common/job.type.js";
 import { getQueueKeys } from "../common/queue.constants.js";
 import { dlq } from "./dlq.types.js";
+import { ackJob } from "../queue/ack.js";
 export const moveJobToDLQ = async (
   jobData: Job,
   result: JobResult
@@ -49,10 +50,11 @@ export const moveJobToDLQ = async (
 
     const queue = getQueueKeys(jobData.queueName);
 
-
+  
+   await redis.set(`job:${jobData.jobId}`, JSON.stringify(jobData));
 
     await redis.rPush(queue.dlq, JSON.stringify(dlqJob));
-
+     await ackJob(jobData);
     
 
 

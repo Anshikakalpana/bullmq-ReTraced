@@ -18,9 +18,12 @@ const processJob = async (job: Job): Promise<void> => {
 
   try {
     
-   const url = "http://host.docker.internal:3002/api/auth";
+   const url = "http://host.docker.internal:3002/api/network";
 
-
+            job.tries += 1;
+  job.updatedAt = Date.now();
+  await redis.set(`job:${job.jobId}`, JSON.stringify(job));
+  
 
     const res = await fetch(url, {
       method: "POST",
@@ -39,9 +42,10 @@ const processJob = async (job: Job): Promise<void> => {
     if (!result) {
       throw new Error("Job handler did not return a result");
     }
-
+ 
     if (result.success) {
      job.status = "completed";
+     
   job.updatedAt = Date.now();
   await redis.set(`job:${job.jobId}`, JSON.stringify(job));
   return;
@@ -52,6 +56,7 @@ const processJob = async (job: Job): Promise<void> => {
     // Permanent failure → DLQ
     if (error?.code && permanentFailures.has(error.code)) {
       job.status = "failed";
+      
       job.updatedAt= Date.now();
 await redis.set(`job:${job.jobId}`, JSON.stringify(job));
       await moveJobToDLQ(job, result);
@@ -69,10 +74,9 @@ await redis.set(`job:${job.jobId}`, JSON.stringify(job));
         result: "PENDING",
         error,
       };
-
+  
       job.retryAttempts = [...(job.retryAttempts ?? []), retryAttempt];
-       job.tries += 1;
-  job.updatedAt = Date.now();
+         await redis.set(`job:${job.jobId}`, JSON.stringify(job));
  
       if (!job.backoffConfig) {
         throw new Error("Missing backoffConfig for retry");
