@@ -8,7 +8,8 @@ export const ackJob = async (job: Job): Promise<void> => {
 
   await redis.multi()
     .lRem(queue.processing, 1, job.jobId)   // remove from LIST
-    .zRem(queue.processingZset, job.jobId)  // remove from ZSET
+    .zRem(queue.processingZset, job.jobId) // remove from ZSET
+    .del(`job:${job.jobId}`) 
     .exec();
 
 };

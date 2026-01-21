@@ -10,10 +10,10 @@ import { exponentialBackoffStrategy } from "./backoffStrategy.js";
 export const handleRetryOrDLQ = async (
   job: Job,
   result: JobResult,
-  delaySeconds?: number
+  delaySeconds: number | 0 
 ): Promise<boolean> => {
-  job.tries += 1;
-  job.updatedAt = Date.now();
+ 
+ const runAt= Date.now() + delaySeconds * 1000;
 
   if (job.tries >= job.maxTries) {
     job.status = "dead";
@@ -25,12 +25,12 @@ export const handleRetryOrDLQ = async (
     return true; // handled
   }
 
-  if (delaySeconds !== undefined) {
-    await delayJob(job, delaySeconds);
+  if (runAt !== undefined) {
+    await delayJob(job, runAt);
     job.status = "delayed";
     console.log("job_delayed", {
       jobId: job.jobId,
-      delaySeconds,
+      runAt,
     });
     return true; // handled
   }

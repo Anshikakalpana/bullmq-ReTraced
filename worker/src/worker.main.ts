@@ -1,5 +1,5 @@
 
-
+import redis from "./utils/redis.js";
 import { Job, JobResult, RetryAttempt } from "./common/job.type.js";
 import { moveJobToDLQ } from "./dlq/dlq.producer.js";
 import { permanentFailures, temporaryFailures } from "./common/failures/error.type.js";
@@ -41,8 +41,10 @@ const processJob = async (job: Job): Promise<void> => {
     }
 
     if (result.success) {
-      job.status = "completed";
-      return;
+     job.status = "completed";
+  job.updatedAt = Date.now();
+  await redis.set(`job:${job.jobId}`, JSON.stringify(job));
+  return;
     }
 
     const error = result.error;
@@ -50,6 +52,8 @@ const processJob = async (job: Job): Promise<void> => {
     // Permanent failure → DLQ
     if (error?.code && permanentFailures.has(error.code)) {
       job.status = "failed";
+      job.updatedAt= Date.now();
+await redis.set(`job:${job.jobId}`, JSON.stringify(job));
       await moveJobToDLQ(job, result);
       return;
     }
@@ -67,12 +71,16 @@ const processJob = async (job: Job): Promise<void> => {
       };
 
       job.retryAttempts = [...(job.retryAttempts ?? []), retryAttempt];
-
+       job.tries += 1;
+  job.updatedAt = Date.now();
+ 
       if (!job.backoffConfig) {
         throw new Error("Missing backoffConfig for retry");
       }
 
       const baseDelay = job.backoffConfig.baseDelaySeconds || 5;
+      await redis.set(`job:${job.jobId}`, JSON.stringify(job));
+
 
       if (job.backoffStrategy === "threeTier") {
         await retryJob(job, result);
@@ -104,6 +112,8 @@ const processJob = async (job: Job): Promise<void> => {
       },
       finishedAt: Date.now(),
     };
+
+await redis.set(`job:${job.jobId}`, JSON.stringify(job));
 
     await moveJobToDLQ(job, result);
     console.error("Error processing job:", err);
