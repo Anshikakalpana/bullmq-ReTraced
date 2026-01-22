@@ -1,15 +1,10 @@
 
 import redis from "./utils/redis.js";
-import { Job, JobResult, RetryAttempt } from "./common/job.type.js";
+import { History, Job, JobResult } from "./common/job.type.js";
 import { moveJobToDLQ } from "./dlq/dlq.producer.js";
 import { permanentFailures, temporaryFailures } from "./common/failures/error.type.js";
 import { JobErrorCode } from "./common/failures/jobErrorCodes.js";
-import { retryJob } from "./retry/threeTierRetry.js";
-import {
-  retryLinearly,
-  retryExponentially,
-  retryAfterFixedInterval,
-} from "./retry/retryStrategy.js";
+import { handleJobFailure } from "./retry/retryDispatcher.js";
 
 const processJob = async (job: Job): Promise<void> => {
   if (!job) {
@@ -67,38 +62,25 @@ await redis.set(`job:${job.jobId}`, JSON.stringify(job));
     if (error?.code && temporaryFailures.has(error.code)) {
       job.status = "delayed";
 
-      const retryAttempt: RetryAttempt = {
+
+      // store history only if needed
+
+      if(job.historyNeed){
+
+      const lastHistory : History = {
         attemptedAt: Date.now(),
         trigger: "AUTO",
         changesMade: false,
         result: "PENDING",
         error,
       };
-  
-      job.retryAttempts = [...(job.retryAttempts ?? []), retryAttempt];
+         
+      job.history = [...(job.history ?? []), lastHistory];
          await redis.set(`job:${job.jobId}`, JSON.stringify(job));
- 
-      if (!job.backoffConfig) {
-        throw new Error("Missing backoffConfig for retry");
-      }
+ }
+       await handleJobFailure(job ,result);
+       return
 
-      const baseDelay = job.backoffConfig.baseDelaySeconds || 5;
-      await redis.set(`job:${job.jobId}`, JSON.stringify(job));
-
-
-      if (job.backoffStrategy === "threeTier") {
-        await retryJob(job, result);
-        return;
-      } else if (job.backoffStrategy === "exponential") {
-        await retryExponentially(job, result);
-        return;
-      } else if (job.backoffStrategy === "fixed") {
-        await retryAfterFixedInterval(job, result, baseDelay);
-        return;
-      } else if (job.backoffStrategy === "linear") {
-        await retryLinearly(job, result, baseDelay);
-        return;
-      }
     }
 
     // Unknown error → DLQ

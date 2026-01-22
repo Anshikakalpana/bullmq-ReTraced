@@ -21,15 +21,16 @@ export type Job = {
 
   tries: number;
   maxTries: number;
-
+  
   lastError?: JobError;
-  deadReason?: string;
+
 
   type?: string;
   priority?: number;
   runAt?: number;
-
-  retryAttempts?: RetryAttempt[];
+  
+  historyNeed: boolean;
+  history?: History[];
 
   backoffConfig: BackoffConfig;
   backoffStrategy?: 'exponential' | 'fixed' | 'threeTier' | 'linear';
@@ -50,15 +51,10 @@ export type JobResult<T = unknown> = {
 };
 
 export type JobData = {
-  emailFrom: string;
-  emailTo: string;
-  subject: string;
-  body: string;
-  template?: string;
-  attachments?: string[];
+      
 };
 
-export type RetryAttempt = {
+export type History = {
   error: JobError;
   attemptedAt: number;
   trigger: 'AUTO' | 'MANUAL';

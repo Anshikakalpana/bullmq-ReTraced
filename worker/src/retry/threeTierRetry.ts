@@ -5,6 +5,7 @@ import { moveJobToDLQ } from "../dlq/dlq.producer.js";
 import { delayJob } from "../delay-jobs/delay-job.js";
 import { exponentialBackoffStrategy } from "./backoffStrategy.js";
 
+// backoffConfig is complulsory for three tier retry strategy for now but not for other retry strategies
 export const retryJob = async (jobData: Job, result: JobResult): Promise<void> => {
   const backoffParams= jobData.backoffConfig;
 

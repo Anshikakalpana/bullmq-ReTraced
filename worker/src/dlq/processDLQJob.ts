@@ -73,6 +73,7 @@ await redis.rPush(queue.poison, JSON.stringify(dlqJob));
       queueName: dlqJob.queueName,
       jobData: dlqJob.jobData as any,
       status: 'pending',
+      historyNeed:true,
       tries: 0,
       backoffConfig: dlqJob.backoffConfig,
       maxTries: dlqJob.maxTries,

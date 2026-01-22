@@ -15,6 +15,7 @@ export const enqueueJobs = async () => {
       status: "pending",
       tries: 0,
       maxTries: 5,
+      historyNeed: true,
       jobData: {
         emailFrom: "noreply@test.com",
         emailTo: "user@test.com",
