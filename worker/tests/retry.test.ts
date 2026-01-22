@@ -182,7 +182,8 @@ describe('retryJob()', () => {
         body: 'Test body',
       },
 
-      retryAttempts: [],
+     historyNeed :true,
+   
 
       backoffConfig: {
         baseDelaySeconds: 1,

@@ -21,6 +21,7 @@ const QUEUE = "queue:email";
       status: "pending",
       tries: 0,
       maxTries: 5,
+      historyNeed: true,
       backoffStrategy: "exponential",
       backoffConfig: {
         baseDelaySeconds: 1,
