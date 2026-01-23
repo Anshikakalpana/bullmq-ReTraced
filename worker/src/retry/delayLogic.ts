@@ -2,10 +2,10 @@
 import { Job, JobResult ,BackoffConfig } from "../common/job.type.js";
 import { moveJobToDLQ } from "../dlq/dlq.producer.js";
 import { delayJob } from "../delay-jobs/delay-job.js";
-import { ackJob } from "../queue/ack.js";
 
 
 
+// this function decide if the job should be retried or moved to dlq 
 
 export const handleRetryOrDLQ = async (
   job: Job,
