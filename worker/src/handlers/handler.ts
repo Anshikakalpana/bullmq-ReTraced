@@ -4,7 +4,7 @@ import { getQueueKeys } from "../common/queue.constants.js";
 
 const queueName = "email";
 const queueKeys = getQueueKeys(queueName);
-const TARGET_JOBS = 1000;
+const TARGET_JOBS = 1;
 
 export const enqueueJobs = async () => {
   for (let i = 0; i < TARGET_JOBS; i++) {

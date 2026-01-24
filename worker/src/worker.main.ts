@@ -13,7 +13,7 @@ const processJob = async (job: Job): Promise<void> => {
 
   try {
     
-   const url = "http://host.docker.internal:3002/api/network";
+   const url = "https://webhook-production-4f89.up.railway.app/api/network";
 
             job.tries += 1;
   job.updatedAt = Date.now();
