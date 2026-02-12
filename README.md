@@ -1,4 +1,4 @@
-﻿# ReTraced — Distributed Job Scheduler (Redis + Node.js)
+﻿# ReTraced — Distributed Job Queue with retry orchestration and observability (Redis + Node.js)
  
 [![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -10,10 +10,10 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg?style=flat-square)](https://github.com/Anshikakalpana/job-scheduler/graphs/commit-activity)
 
-**ReTraced** is a Dockerized **distributed job scheduler** built with  
+**ReTraced** is a Dockerized **Distributed Job Queue with retry orchestration and observability** built with  
 **Node.js + TypeScript + Redis**, focused on **reliability, retries, DLQ, and observability**.
 
->  _ReTraced tells the lifecycle story of every job it schedules — from execution to retries to DLQ._
+>  _ReTraced tells the lifecycle story of every job it executes — from execution to retries to DLQ._
 
 ---
 
@@ -150,6 +150,7 @@ Feel free to check the [issues page](https://github.com/Anshikakalpana/job-sched
 Give a ⭐️ if this project helped you!
 
 ---
+
 
 
 
